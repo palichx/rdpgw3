@@ -22,6 +22,7 @@ var (
 	UserEncryptionKey []byte
 	QuerySigningKey   []byte
 	AdminGroup        string
+	GroupHosts        map[string][]string
 	OIDCProvider      *oidc.Provider
 	Oauth2Config      oauth2.Config
 )

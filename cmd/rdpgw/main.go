@@ -95,6 +95,7 @@ func main() {
 	security.HostSelection = conf.Server.HostSelection
 	security.Hosts = conf.Server.Hosts
 	security.AdminGroup = conf.Server.AdminGroup
+	security.GroupHosts = conf.Server.GroupHosts
 
 	// init session store
 	web.InitStore([]byte(conf.Server.SessionKey),
@@ -103,6 +104,7 @@ func main() {
 		conf.Server.MaxSessionLength,
 	)
         web.SetGroupAdmin(conf.Server.AdminGroup,)
+        web.SetGroupHosts(conf.Server.GroupHosts,)
 	// configure web backend
 	w := &web.Config{
 		QueryInfo:        security.QueryInfo,

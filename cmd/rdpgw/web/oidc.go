@@ -33,6 +33,7 @@ type OIDCConfig struct {
 
 
 var Groupadmin string
+var Grouphosts map[string][]string
 
 func SetGroupAdmin(Groupadmintest string) {
         if len(Groupadmintest) < 32 {
@@ -40,6 +41,22 @@ func SetGroupAdmin(Groupadmintest string) {
         }
      Groupadmin = Groupadmintest
 }
+
+func SetGroupHosts(Grouphoststest map[string][]string) {
+        if len(Grouphoststest) < 32 {
+                log.Printf("Hosts  %s by policy handler", Grouphoststest)
+        }
+      Grouphosts = Grouphoststest
+      for key, hosts := range  Grouphoststest {
+      log.Printf("%s:\n", key)
+        for _, host := range hosts {
+          log.Printf("  - %s\n", host)
+        }
+      }
+
+}
+
+
 
 
 func (c *OIDCConfig) New() *OIDC {

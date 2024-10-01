@@ -42,6 +42,7 @@ type ServerConfig struct {
 	CertFile             string   `koanf:"certfile"`
 	KeyFile              string   `koanf:"keyfile"`
 	Hosts                []string `koanf:"hosts"`
+	GroupHosts           map[string][]string `koanf:"GroupHosts"`
 	HostSelection        string   `koanf:"hostselection"`
 	AdminGroup           string   `koanf:"AdminGroup"`
 	SessionKey           string   `koanf:"sessionkey"`
