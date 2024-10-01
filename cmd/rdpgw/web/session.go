@@ -17,6 +17,7 @@ const (
 
 var sessionStore sessions.Store
 
+
 func InitStore(sessionKey []byte, encryptionKey []byte, storeType string, maxLength int) {
 	if len(sessionKey) < 32 {
 		log.Fatal("Session key too small")

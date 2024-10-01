@@ -12,6 +12,7 @@ import (
 	"github.com/bolkedebruin/rdpgw/cmd/rdpgw/protocol"
 	"github.com/bolkedebruin/rdpgw/cmd/rdpgw/security"
 	"github.com/bolkedebruin/rdpgw/cmd/rdpgw/web"
+	"github.com/bolkedebruin/rdpgw/cmd/rdpgw/docker"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -71,8 +72,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	conf = config.Load(opts.ConfigFile)
 
+	conf = config.Load(opts.ConfigFile)
+	//log.Printf("CONFIG %s ", conf)
 	// set callback url and external advertised gateway address
 	url, err := url.Parse(conf.Server.GatewayAddress)
 	if err != nil {
@@ -92,6 +94,7 @@ func main() {
 	security.QuerySigningKey = []byte(conf.Security.QueryTokenSigningKey)
 	security.HostSelection = conf.Server.HostSelection
 	security.Hosts = conf.Server.Hosts
+	security.AdminGroup = conf.Server.AdminGroup
 
 	// init session store
 	web.InitStore([]byte(conf.Server.SessionKey),
@@ -99,7 +102,7 @@ func main() {
 		conf.Server.SessionStore,
 		conf.Server.MaxSessionLength,
 	)
-
+        web.SetGroupAdmin(conf.Server.AdminGroup,)
 	// configure web backend
 	w := &web.Config{
 		QueryInfo:        security.QueryInfo,
@@ -123,7 +126,6 @@ func main() {
 		w.UserTokenGenerator = security.GenerateUserToken
 	}
 	h := w.NewHandler()
-
 	log.Printf("Starting remote desktop gateway server")
 	cfg := &tls.Config{}
 
@@ -209,6 +211,10 @@ func main() {
 
 	// for sso callbacks
 	r.HandleFunc("/tokeninfo", web.TokenInfo)
+	r.HandleFunc("/UserInfo", protocol.UserInfo)
+	r.HandleFunc("/docker", docker.GetStatusPersonalContainer)
+	r.HandleFunc("/portal2", docker.GoodPortal)
+	//r.HandleFunc("/portal", o.Authenticated(http.HandlerFunc(docker.GoodPortal)))
 
 	// gateway endpoint
 	rdp := r.PathPrefix(gatewayEndPoint).Subrouter()
@@ -218,8 +224,8 @@ func main() {
 		log.Printf("enabling openid extended authentication")
 		o := initOIDC(url)
 		r.Handle("/connect", o.Authenticated(http.HandlerFunc(h.HandleDownload)))
-		r.HandleFunc("/callback", o.HandleCallback)
-
+		r.HandleFunc("/callback", o.HandleCallback )
+		r.Handle("/portal", o.Authenticated(http.HandlerFunc(docker.GoodPortal)))
 		// only enable un-auth endpoint for openid only config
 		if !conf.Server.KerberosEnabled() && !conf.Server.BasicAuthEnabled() && !conf.Server.NtlmEnabled() {
 			rdp.Name("gw").HandlerFunc(gw.HandleGatewayProtocol)

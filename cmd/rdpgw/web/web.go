@@ -51,6 +51,7 @@ type Handler struct {
 	hostSelection      string
 	rdpOpts            RdpOpts
 	rdpDefaults        string
+	connectionType     int
 }
 
 func (c *Config) NewHandler() *Handler {
@@ -78,7 +79,44 @@ func (h *Handler) selectRandomHost() string {
 	return host
 }
 
-func (h *Handler) getHost(ctx context.Context, u *url.URL) (string, error) {
+func (h *Handler) getConnectionType(ctx context.Context, u *url.URL, r *http.Request) (int, error) {
+
+	connectionType, ok := u.Query()["connectiontype"]
+                if !ok {
+                        return 4, nil
+                }
+		if connectionType[0] == "1" {
+			return 1, nil
+		}
+		if connectionType[0] == "2" {
+                	return 3, nil
+                }
+		if connectionType[0] == "3" {
+                	return 3, nil
+                }
+                if connectionType[0] == "4" {
+                        return 4, nil
+                }
+                if connectionType[0] == "5" {
+                        return 5, nil
+                }
+                if connectionType[0] == "6" {
+                        return 6, nil
+                }
+                if connectionType[0] == "7" {
+                        return 7, nil
+                }
+
+		return 4, nil
+
+
+
+ }
+
+
+func (h *Handler) getHost(ctx context.Context, u *url.URL, r *http.Request) (string, error) {
+	 id := identity.FromRequestCtx(r)
+
 	switch h.hostSelection {
 	case "roundrobin":
 		return h.selectRandomHost(), nil
@@ -108,7 +146,16 @@ func (h *Handler) getHost(ctx context.Context, u *url.URL) (string, error) {
 		if !ok {
 			return "", errors.New("invalid query parameter")
 		}
+		log.Printf("ADD LOG8 %s GETHOSTNAME", hosts[0])
+		hosts[0] = strings.Replace(hosts[0], "USERNAME", id.UserName(), 1)
+		log.Printf("ADD LOG9 %s changed getting host", hosts[0])
 		for _, check := range h.hosts {
+			check = strings.Replace(check, "{{ preferred_username }}", id.UserName(), 1)
+			log.Printf("ADD LOG4 %s specified in token", hosts[0])
+			log.Printf("ADD LOG5 %s specified in token", check)
+			log.Printf("ADD LOG7 %s specified in token", id.UserName())
+			log.Printf("signed p2 %s specified in token", ctx)
+			log.Printf("signed p4 %s specified in token", h.queryTokenIssuer)
 			if check == hosts[0] {
 				return hosts[0], nil
 			}
@@ -140,7 +187,7 @@ func (h *Handler) HandleDownload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// determine host to connect to
-	host, err := h.getHost(ctx, r.URL)
+	host, err := h.getHost(ctx, r.URL, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -217,12 +264,15 @@ func (h *Handler) HandleDownload(w http.ResponseWriter, r *http.Request) {
 			d.Settings.Domain = domain
 		}
 	}
+	connectiontype, err := h.getConnectionType(ctx, r.URL, r)
+	log.Printf("CONNECTIONTYPE  %s by policy handler", connectiontype)
 	d.Settings.FullAddress = host
 	d.Settings.GatewayHostname = h.gatewayAddress.Host
 	d.Settings.GatewayCredentialsSource = rdp.SourceCookie
 	d.Settings.GatewayAccessToken = token
 	d.Settings.GatewayCredentialMethod = 1
 	d.Settings.GatewayUsageMethod = 1
+	d.Settings.ConnectionType = connectiontype
 
 	http.ServeContent(w, r, fn, time.Now(), strings.NewReader(d.String()))
 }

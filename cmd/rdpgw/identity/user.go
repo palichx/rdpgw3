@@ -46,9 +46,13 @@ func (u *User) UserName() string {
 	return u.userName
 }
 
+
+
 func (u *User) SetUserName(s string) {
 	u.userName = s
 }
+
+
 
 func (u *User) DisplayName() string {
 	if u.displayName == "" {
@@ -93,6 +97,9 @@ func (u *User) SetAttribute(s string, i interface{}) {
 	u.attributes[s] = i
 }
 
+
+
+
 func (u *User) GetAttribute(s string) interface{} {
 	if found, ok := u.attributes[s]; ok {
 		return found
@@ -100,13 +107,20 @@ func (u *User) GetAttribute(s string) interface{} {
 	return nil
 }
 
+
+
 func (u *User) Attributes() map[string]interface{} {
 	return u.attributes
 }
 
+
+
 func (u *User) DelAttribute(s string) {
 	delete(u.attributes, s)
 }
+
+
+
 
 func (u *User) Email() string {
 	return u.email
@@ -164,7 +178,6 @@ func (u *User) Unmarshal(b []byte) error {
 	u.authTime = uu.AuthTime
 	u.expiry = uu.Expiry
 	u.attributes = uu.Attributes
-	u.groupMembership = uu.GroupMembership
 
 	return nil
 }

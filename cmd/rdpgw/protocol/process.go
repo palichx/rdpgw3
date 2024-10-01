@@ -12,6 +12,8 @@ import (
 	"net"
 	"strconv"
 	"time"
+	"github.com/bolkedebruin/rdpgw/cmd/rdpgw/docker"
+	"strings"
 )
 
 type Processor struct {
@@ -87,6 +89,10 @@ func (p *Processor) Process(ctx context.Context) error {
 					return fmt.Errorf("%x: invalid PAA cookie", E_PROXY_COOKIE_AUTHENTICATION_ACCESS_DENIED)
 				}
 			}
+			log.Printf("COOKIE %s", cookie)
+			log.Printf("PKT %s", pkt)
+			log.Printf("pt %s", pt)
+			log.Printf("sz %s", sz)
 			msg := p.tunnelResponse(ERROR_SUCCESS)
 			p.tunnel.Write(msg)
 			p.state = SERVER_STATE_TUNNEL_CREATE
@@ -121,9 +127,14 @@ func (p *Processor) Process(ctx context.Context) error {
 				return fmt.Errorf("%x: Channel create rejected, wrong state", E_PROXY_INTERNALERROR)
 			}
 			server, port := p.channelRequest(pkt)
+			client := p.tunnelAuthRequest(pkt)
 			host := net.JoinHostPort(server, strconv.Itoa(int(port)))
+			log.Printf("Not allowed to connect to10 %s by policy handler", p)
+			log.Printf("Not allowed to connect to12 %s by policy handler", ctx)
+			log.Printf("Not allowed to connect to14 %s by policy handler", pkt)
 			if p.gw.CheckHost != nil {
 				log.Printf("Verifying %s host connection", host)
+				log.Printf("Verifying111 %s host connection", client)
 				if ok, _ := p.gw.CheckHost(ctx, host); !ok {
 					log.Printf("Not allowed to connect to %s by policy handler", host)
 					msg := p.channelResponse(E_PROXY_RAP_ACCESSDENIED)
@@ -132,7 +143,14 @@ func (p *Processor) Process(ctx context.Context) error {
 				}
 			}
 			log.Printf("Establishing connection to RDP server: %s", host)
-			p.tunnel.rwc, err = net.DialTimeout("tcp", host, time.Second*15)
+			//if host == "test-webtop:3389" {	
+			//docker.GetStatusPersonalContainer2()
+			//}
+			if strings.HasPrefix(host, "localcontainer"){
+			host_without_port := strings.Split(host, ":")
+			docker.GetStatusPersonalContainer2(host_without_port[0])
+			}
+			p.tunnel.rwc, err = net.DialTimeout("tcp", host, time.Second*30)
 			if err != nil {
 				log.Printf("Error connecting to %s, %s", host, err)
 				msg := p.channelResponse(E_PROXY_INTERNALERROR)
@@ -145,9 +163,20 @@ func (p *Processor) Process(ctx context.Context) error {
 			p.tunnel.Write(msg)
 
 			// Make sure to start the flow from the RDP server first otherwise connections
-			// might hang eventually
+			// might hang eventuall
 			go forward(p.tunnel.rwc, p.tunnel)
 			p.state = SERVER_STATE_CHANNEL_CREATE
+			addSessionTS(p.tunnel.Id,p.tunnel.TargetServer)
+			addSessionUser(p.tunnel.Id,p.tunnel.User.UserName())
+		        log.Printf("TUNNNEL RWC %s", p)
+		        log.Printf("TUNNNEL RWC %s", p.tunnel.rwc)
+		        log.Printf("TUNNNEL RWC %s", p.tunnel.rwc.LocalAddr())
+		        log.Printf("TUNNNEL RWC %s", p.tunnel.rwc.RemoteAddr())
+			
+		        //log.Printf("TUNNNEL1 P%s", p)
+			//log.Printf("TUNNNEL12 P%s", p.tunnel.User)
+		        //log.Printf("TUNNNEL12 P%s", p.tunnel.User.UserName)
+		        //log.Printf("TUNNNEL12 P%s", p.tunnel.User.UserName())
 		case PKT_TYPE_DATA:
 			if p.state < SERVER_STATE_CHANNEL_CREATE {
 				log.Printf("Data received while in wrong state %d != %d", p.state, SERVER_STATE_CHANNEL_CREATE)
@@ -173,6 +202,8 @@ func (p *Processor) Process(ctx context.Context) error {
 			msg := p.channelCloseResponse(ERROR_SUCCESS)
 			p.tunnel.Write(msg)
 			p.state = SERVER_STATE_CLOSED
+			delSessionTS(p.tunnel.Id,)
+			delSessionUser(p.tunnel.Id,)
 			return nil
 		default:
 			log.Printf("Unknown packet (size %d): %x", sz, pkt)

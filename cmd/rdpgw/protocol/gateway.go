@@ -53,10 +53,11 @@ type Gateway struct {
 }
 
 var upgrader = websocket.Upgrader{}
-var c = cache.New(5*time.Minute, 10*time.Minute)
+var c = cache.New(60*time.Minute, 10*time.Minute)
 
 func (g *Gateway) HandleGatewayProtocol(w http.ResponseWriter, r *http.Request) {
 	connectionCache.Set(float64(c.ItemCount()))
+	log.Printf("HEader CCCCCCCCCCCC COUNT: %s", c.ItemCount())
 
 	var t *Tunnel
 
@@ -64,6 +65,9 @@ func (g *Gateway) HandleGatewayProtocol(w http.ResponseWriter, r *http.Request) 
 	id := identity.FromRequestCtx(r)
 
 	connId := r.Header.Get(rdgConnectionIdKey)
+	log.Printf("HEader: %s", r.Header)
+	log.Printf("HEader CCCCCCCCCCCC: %s", c)
+
 	x, found := c.Get(connId)
 	if !found {
 		t = &Tunnel{
@@ -162,7 +166,6 @@ func (g *Gateway) setSendReceiveBuffers(conn net.Conn) error {
 func (g *Gateway) handleWebsocketProtocol(ctx context.Context, c *websocket.Conn, t *Tunnel) {
 	websocketConnections.Inc()
 	defer websocketConnections.Dec()
-
 	inout, _ := transport.NewWS(c)
 	defer inout.Close()
 
@@ -170,7 +173,7 @@ func (g *Gateway) handleWebsocketProtocol(ctx context.Context, c *websocket.Conn
 	t.transportOut = inout
 	t.transportIn = inout
 	t.ConnectedOn = time.Now()
-
+	//appendActiveUser(t,)
 	handler := NewProcessor(g, t)
 	RegisterTunnel(t, handler)
 	defer RemoveTunnel(t)

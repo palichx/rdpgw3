@@ -43,6 +43,7 @@ type ServerConfig struct {
 	KeyFile              string   `koanf:"keyfile"`
 	Hosts                []string `koanf:"hosts"`
 	HostSelection        string   `koanf:"hostselection"`
+	AdminGroup           string   `koanf:"AdminGroup"`
 	SessionKey           string   `koanf:"sessionkey"`
 	SessionEncryptionKey string   `koanf:"sessionencryptionkey"`
 	SessionStore         string   `koanf:"sessionstore"`
