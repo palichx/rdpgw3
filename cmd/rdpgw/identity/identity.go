@@ -18,6 +18,7 @@ const (
 type Identity interface {
 	UserName() string
 	SetUserName(string)
+	SetGroups([]interface{})
 	DisplayName() string
 	SetDisplayName(string)
 	Domain() string

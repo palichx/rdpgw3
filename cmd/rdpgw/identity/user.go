@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"github.com/google/uuid"
 	"time"
+	"log"
 )
 
 type User struct {
@@ -18,6 +19,7 @@ type User struct {
 	expiry          time.Time
 	attributes      map[string]interface{}
 	groupMembership map[string]bool
+	userGroups      []interface{}
 }
 
 type user struct {
@@ -31,6 +33,7 @@ type user struct {
 	Expiry          time.Time
 	Attributes      map[string]interface{}
 	GroupMembership map[string]bool
+	UserGroups      []interface{}
 }
 
 func NewUser() *User {
@@ -98,6 +101,10 @@ func (u *User) SetAttribute(s string, i interface{}) {
 }
 
 
+func (u *User) SetGroups(s []interface{}) {
+        u.userGroups = s
+	log.Printf("SET GROUPS  %s by policy handler", s)
+}
 
 
 func (u *User) GetAttribute(s string) interface{} {
@@ -152,6 +159,7 @@ func (u *User) Marshal() ([]byte, error) {
 		Expiry:          u.expiry,
 		Attributes:      u.attributes,
 		GroupMembership: u.groupMembership,
+		UserGroups:      u.userGroups,
 	}
 	err := enc.Encode(uu)
 
@@ -178,6 +186,7 @@ func (u *User) Unmarshal(b []byte) error {
 	u.authTime = uu.AuthTime
 	u.expiry = uu.Expiry
 	u.attributes = uu.Attributes
+	u.userGroups= uu.UserGroups
 
 	return nil
 }

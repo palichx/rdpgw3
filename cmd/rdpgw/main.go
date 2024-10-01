@@ -105,6 +105,7 @@ func main() {
 	)
         web.SetGroupAdmin(conf.Server.AdminGroup,)
         web.SetGroupHosts(conf.Server.GroupHosts,)
+        security.SetGroupHosts(conf.Server.GroupHosts,)
 	// configure web backend
 	w := &web.Config{
 		QueryInfo:        security.QueryInfo,

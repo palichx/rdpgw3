@@ -137,21 +137,25 @@ func (h *OIDC) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	 
 	for _, element := range Groups {
-        	if element == Groupadmin {
-			log.Printf("GROUP MATCH  %s %s", element, Groupadmin)
-			id.SetUserName(userName)
-			id.SetAuthenticated(true)
-			id.SetAuthTime(time.Now())
-                        id.SetAttribute(identity.AttrAccessToken, oauth2Token.AccessToken)
-			log.Printf("#######################  %s by policy handler", userName)
-			if err = SaveSessionIdentity(r, w, id); err != nil {
-	        	        http.Error(w, err.Error(), http.StatusInternalServerError)
-        		}
-			http.Redirect(w, r, url, http.StatusFound)
-			break
-        	} else {
+		for key := range  Grouphosts {
+	        	if element == key {
+				log.Printf("GROUP MATCH  %s %s", element, Groupadmin)
+				id.SetUserName(userName)
+				id.SetGroups(Groups)
+				id.SetAuthenticated(true)
+				id.SetAuthTime(time.Now())
+        	                id.SetAttribute(identity.AttrAccessToken, oauth2Token.AccessToken)
+				log.Printf("#######################  %s by policy handler", userName)
+				if err = SaveSessionIdentity(r, w, id); err != nil {
+	        		        http.Error(w, err.Error(), http.StatusInternalServerError)
+        			}
+				http.Redirect(w, r, url, http.StatusFound)
+				break
+        		
+		} else {
 			log.Printf("GROUP NOT MATCH  %s %s", element, Groupadmin)
         	}
+		}
 
 	}
 	http.Error(w, "no oidc claim for username found", http.StatusInternalServerError)

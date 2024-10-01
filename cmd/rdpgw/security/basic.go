@@ -13,6 +13,25 @@ var (
 	HostSelection string
 )
 
+
+var Grouphosts map[string][]string
+
+
+func SetGroupHosts(Grouphoststest map[string][]string) {
+        if len(Grouphoststest) < 32 {
+                log.Printf("Hosts  %s by policy handler", Grouphoststest)
+        }
+      Grouphosts = Grouphoststest
+      for key, hosts := range  Grouphoststest {
+      log.Printf("%s:\n", key)
+        for _, host := range hosts {
+          log.Printf("  - %s\n", host)
+        }
+      }
+
+}
+
+
 func CheckHost(ctx context.Context, host string) (bool, error) {
 	switch HostSelection {
 	case "any":
