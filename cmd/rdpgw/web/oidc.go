@@ -34,6 +34,7 @@ type OIDCConfig struct {
 
 var Groupadmin string
 var Grouphosts map[string][]string
+var AcceptedHosts []string
 
 func SetGroupAdmin(Groupadmintest string) {
         if len(Groupadmintest) < 32 {
@@ -135,36 +136,54 @@ func (h *OIDC) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	if userName == "" {
 		http.Error(w, "no oidc claim for username found", http.StatusInternalServerError)
 	}
-	 
+	AcceptedHosts = nil
 	for _, element := range Groups {
 		for key, hosts := range  Grouphosts {
 	        	if element == key {
 				log.Printf("GROUP MATCH  %s %s", element, Groupadmin)
 				        for _, host := range hosts {
-         					 log.Printf("  - %s\n", host)
-						 id.SetAcceptedHost(host)
+						 AcceptedHosts = append(AcceptedHosts,host)
+       					 log.Printf("TEST  - %s\n", host)
+						 //id.SetAcceptedHost(host)
 				        }
+					//id.SetAcceptedHost(Test)
 
 			//				id.SetAcceptedHost(host)
-				id.SetUserName(userName)
+			//	id.SetUserName(userName)
 
 				//SAVE user groups from oidc
-				id.SetGroups(Groups)
-				id.SetAuthenticated(true)
-				id.SetAuthTime(time.Now())
-        	                id.SetAttribute(identity.AttrAccessToken, oauth2Token.AccessToken)
-				log.Printf("#######################  %s by policy handler", userName)
-				if err = SaveSessionIdentity(r, w, id); err != nil {
-	        		        http.Error(w, err.Error(), http.StatusInternalServerError)
-        			}
-				http.Redirect(w, r, url, http.StatusFound)
-				break
+			//	id.SetGroups(Groups)
+			//	id.SetAuthenticated(true)
+			//	id.SetAuthTime(time.Now())
+      	                //	id.SetAttribute(identity.AttrAccessToken, oauth2Token.AccessToken)
+			//	log.Printf("#######################  %s by policy handler", userName)
+			//	if err = SaveSessionIdentity(r, w, id); err != nil {
+	        	//	        http.Error(w, err.Error(), http.StatusInternalServerError)
+        		//	}
+			//	http.Redirect(w, r, url, http.StatusFound)
+				//break
         		
 		} else {
 			log.Printf("GROUP NOT MATCH  %s %s", element, Groupadmin)
         	}
 		}
+		//log.Printf("TEST contains  - %s\n", Test)
+		//id.SetAcceptedHost(Test)
 
+	}
+	if len(AcceptedHosts)> 0 {
+	log.Printf("TEST contains  - %s\n", AcceptedHosts)
+	id.SetAcceptedHost(AcceptedHosts)
+	id.SetUserName(userName)
+	id.SetGroups(Groups)
+        id.SetAuthenticated(true)
+        id.SetAuthTime(time.Now())
+        id.SetAttribute(identity.AttrAccessToken, oauth2Token.AccessToken)
+        log.Printf("#######################  %s by policy handler", userName)
+        if err = SaveSessionIdentity(r, w, id); err != nil {
+                    http.Error(w, err.Error(), http.StatusInternalServerError)
+         }
+        http.Redirect(w, r, url, http.StatusFound)
 	}
 	http.Error(w, "no oidc claim for username found", http.StatusInternalServerError)
 	//id.SetUserName(userName)

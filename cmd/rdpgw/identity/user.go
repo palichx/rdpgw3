@@ -104,9 +104,14 @@ func (u *User) SetAttribute(s string, i interface{}) {
 
 
 
-func (u *User) SetAcceptedHost(s string) {
-        u.userAcceptedHosts = append(u.userAcceptedHosts,s)
+func (u *User) SetAcceptedHost(s []string) {
+        u.userAcceptedHosts = s
         log.Printf("SET ACCEPTED HOSTS  %s by policy handler", u.userAcceptedHosts)
+}
+
+func (u *User) AcceptedHosts() []string  {
+	log.Printf("SAVED HOSTS  %s by policy handler", u.userAcceptedHosts)
+        return u.userAcceptedHosts
 }
 
 

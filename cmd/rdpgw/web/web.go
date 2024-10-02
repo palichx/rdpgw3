@@ -154,7 +154,7 @@ func (h *Handler) getHost(ctx context.Context, u *url.URL, r *http.Request) (str
 			log.Printf("ADD LOG4 %s specified in token", hosts[0])
 			log.Printf("ADD LOG5 %s specified in token", check)
 			log.Printf("ADD LOG7 %s specified in token", id.UserName())
-			log.Printf("ADD LOG70 GROUPS %s specified in token", id.Groups())
+			log.Printf("ADD LOG70 HOSTS %s specified in token", id.AcceptedHosts())
 			log.Printf("signed p2 %s specified in token", ctx)
 			log.Printf("signed p4 %s specified in token", h.queryTokenIssuer)
 			if check == hosts[0] {
