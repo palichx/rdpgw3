@@ -137,10 +137,18 @@ func (h *OIDC) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	 
 	for _, element := range Groups {
-		for key := range  Grouphosts {
+		for key, hosts := range  Grouphosts {
 	        	if element == key {
 				log.Printf("GROUP MATCH  %s %s", element, Groupadmin)
+				        for _, host := range hosts {
+         					 log.Printf("  - %s\n", host)
+						 id.SetAcceptedHost(host)
+				        }
+
+			//				id.SetAcceptedHost(host)
 				id.SetUserName(userName)
+
+				//SAVE user groups from oidc
 				id.SetGroups(Groups)
 				id.SetAuthenticated(true)
 				id.SetAuthTime(time.Now())

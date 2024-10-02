@@ -19,6 +19,8 @@ type Identity interface {
 	UserName() string
 	SetUserName(string)
 	SetGroups([]interface{})
+	SetAcceptedHost(string)
+	Groups() []interface{}
 	DisplayName() string
 	SetDisplayName(string)
 	Domain() string

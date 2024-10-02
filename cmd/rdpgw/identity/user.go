@@ -20,6 +20,7 @@ type User struct {
 	attributes      map[string]interface{}
 	groupMembership map[string]bool
 	userGroups      []interface{}
+	userAcceptedHosts      []string
 }
 
 type user struct {
@@ -34,6 +35,7 @@ type user struct {
 	Attributes      map[string]interface{}
 	GroupMembership map[string]bool
 	UserGroups      []interface{}
+	UserAcceptedHosts      []string
 }
 
 func NewUser() *User {
@@ -101,10 +103,22 @@ func (u *User) SetAttribute(s string, i interface{}) {
 }
 
 
+
+func (u *User) SetAcceptedHost(s string) {
+        u.userAcceptedHosts = append(u.userAcceptedHosts,s)
+        log.Printf("SET ACCEPTED HOSTS  %s by policy handler", u.userAcceptedHosts)
+}
+
+
 func (u *User) SetGroups(s []interface{}) {
         u.userGroups = s
 	log.Printf("SET GROUPS  %s by policy handler", s)
 }
+
+func (u *User) Groups() []interface{}  {
+        return u.userGroups
+}
+
 
 
 func (u *User) GetAttribute(s string) interface{} {
@@ -160,6 +174,7 @@ func (u *User) Marshal() ([]byte, error) {
 		Attributes:      u.attributes,
 		GroupMembership: u.groupMembership,
 		UserGroups:      u.userGroups,
+		UserAcceptedHosts:      u.userAcceptedHosts,
 	}
 	err := enc.Encode(uu)
 
@@ -187,6 +202,7 @@ func (u *User) Unmarshal(b []byte) error {
 	u.expiry = uu.Expiry
 	u.attributes = uu.Attributes
 	u.userGroups= uu.UserGroups
+	u.userAcceptedHosts= uu.UserAcceptedHosts
 
 	return nil
 }

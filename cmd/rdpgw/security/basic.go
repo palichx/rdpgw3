@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"github.com/bolkedebruin/rdpgw/cmd/rdpgw/identity"
 )
 
 var (
@@ -48,7 +49,10 @@ func CheckHost(ctx context.Context, host string) (bool, error) {
 		log.Printf("Checking host for user %s", s.User.UserName())
 		for _, h := range Hosts {
 			h = strings.Replace(h, "{{ preferred_username }}", s.User.UserName(), 1)
+			id := identity.FromCtx(ctx)
+
 			log.Printf("ADDITIONAL LOG1 %s", s.User)
+			log.Printf("ADDITIONAL LOG GROUPS GROUPS %s", id.Groups())
 			log.Printf("ADDITIONAL LOG2 %s", h)
 			log.Printf("ADDITIONAL LOG3 %s", host)
 			if h == host {
