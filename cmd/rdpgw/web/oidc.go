@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"github.com/bolkedebruin/rdpgw/cmd/rdpgw/identity"
+	"github.com/bolkedebruin/rdpgw/cmd/rdpgw/security"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/patrickmn/go-cache"
 	"golang.org/x/oauth2"
@@ -173,6 +174,7 @@ func (h *OIDC) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(AcceptedHosts)> 0 {
 	log.Printf("TEST contains  - %s\n", AcceptedHosts)
+	security.SetAccepedHostsByUser(userName,AcceptedHosts)
 	id.SetAcceptedHost(AcceptedHosts)
 	id.SetUserName(userName)
 	id.SetGroups(Groups)

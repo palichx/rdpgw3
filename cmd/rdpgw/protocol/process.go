@@ -132,6 +132,7 @@ func (p *Processor) Process(ctx context.Context) error {
 			log.Printf("Not allowed to connect to10 %s by policy handler", p)
 			log.Printf("Not allowed to connect to12 %s by policy handler", ctx)
 			log.Printf("Not allowed to connect to14 %s by policy handler", pkt)
+			log.Printf("ADD ACCEPTED HOST from tunnel %s", p.tunnel.User.AcceptedHosts())
 			if p.gw.CheckHost != nil {
 				log.Printf("Verifying %s host connection", host)
 				log.Printf("Verifying111 %s host connection", client)

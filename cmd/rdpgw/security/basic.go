@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"github.com/bolkedebruin/rdpgw/cmd/rdpgw/identity"
 )
 
 var (
@@ -16,7 +15,7 @@ var (
 
 
 var Grouphosts map[string][]string
-
+var  AccepedHostsByUser = make(map[string][]string)
 
 func SetGroupHosts(Grouphoststest map[string][]string) {
         if len(Grouphoststest) < 32 {
@@ -31,6 +30,14 @@ func SetGroupHosts(Grouphoststest map[string][]string) {
       }
 
 }
+
+func SetAccepedHostsByUser(user string,AccepedHosts []string){
+	 AccepedHostsByUser[user] = AccepedHosts
+//	AccepedHostsByUser[user] = []string{AccepedHosts}
+	log.Printf("AccepedHostsByUser %s %s", user ,AccepedHosts)
+
+}
+
 
 
 func CheckHost(ctx context.Context, host string) (bool, error) {
@@ -47,12 +54,15 @@ func CheckHost(ctx context.Context, host string) (bool, error) {
 		}
 
 		log.Printf("Checking host for user %s", s.User.UserName())
-		for _, h := range Hosts {
+//		id := identity.FromCtx(ctx)
+		log.Printf("ADDITIONAL LOG ACCEPTED HOSTS %s", AccepedHostsByUser[s.User.UserName()] )
+
+		for _, h := range AccepedHostsByUser[s.User.UserName()]  {
 			h = strings.Replace(h, "{{ preferred_username }}", s.User.UserName(), 1)
-			id := identity.FromCtx(ctx)
+			//id := identity.FromCtx(ctx)
 
 			log.Printf("ADDITIONAL LOG1 %s", s.User)
-			log.Printf("ADDITIONAL LOG GROUPS GROUPS %s", id.Groups())
+			log.Printf("ADDITIONAL LOG GROUPS GROUPS %s", s.User.Groups())
 			log.Printf("ADDITIONAL LOG2 %s", h)
 			log.Printf("ADDITIONAL LOG3 %s", host)
 			if h == host {

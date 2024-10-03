@@ -19,6 +19,7 @@ type Identity interface {
         UserName() string
         SetUserName(string)
         DisplayName() string
+        AcceptedHosts() []string
         SetDisplayName(string)
         Domain() string
         SetDomain(string)

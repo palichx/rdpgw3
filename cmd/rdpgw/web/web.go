@@ -116,7 +116,6 @@ func (h *Handler) getConnectionType(ctx context.Context, u *url.URL, r *http.Req
 
 func (h *Handler) getHost(ctx context.Context, u *url.URL, r *http.Request) (string, error) {
 	 id := identity.FromRequestCtx(r)
-
 	switch h.hostSelection {
 	case "roundrobin":
 		return h.selectRandomHost(), nil
@@ -149,7 +148,8 @@ func (h *Handler) getHost(ctx context.Context, u *url.URL, r *http.Request) (str
 		log.Printf("ADD LOG8 %s GETHOSTNAME", hosts[0])
 		hosts[0] = strings.Replace(hosts[0], "USERNAME", id.UserName(), 1)
 		log.Printf("ADD LOG9 %s changed getting host", hosts[0])
-		for _, check := range h.hosts {
+		//for _, check := range h.hosts {
+		for _, check := range id.AcceptedHosts() {
 			check = strings.Replace(check, "{{ preferred_username }}", id.UserName(), 1)
 			log.Printf("ADD LOG4 %s specified in token", hosts[0])
 			log.Printf("ADD LOG5 %s specified in token", check)
