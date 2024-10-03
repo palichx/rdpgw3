@@ -189,6 +189,19 @@ func GetStatusPersonalContainer2(cName string) {
 }
 
 
+func uniqueElements(input []string) []string {
+    uniqueMap := make(map[string]bool)
+    uniqueSlice := []string{}
+
+    for _, val := range input {
+        if _, ok := uniqueMap[val]; !ok {
+            uniqueMap[val] = true
+            uniqueSlice = append(uniqueSlice, val)
+        }
+    }
+
+    return uniqueSlice
+}
 
 func GoodPortal(w http.ResponseWriter, r *http.Request) {
 	id := identity.FromRequestCtx(r)
@@ -208,7 +221,8 @@ func GoodPortal(w http.ResponseWriter, r *http.Request) {
 w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	var test string
 	var i int
-	 for _, hosts := range id.AcceptedHosts() {
+	 unique := uniqueElements(id.AcceptedHosts())
+	 for _, hosts := range unique {
 		i++
 		numberStr := fmt.Sprintf("%d", i)
 		hosts = strings.Replace(hosts, "{{ preferred_username }}", id.UserName(), 1)
@@ -293,6 +307,7 @@ w.Header().Set("Content-Type", "text/html; charset=UTF-8")
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
 	    min-width: 250px;
+	    max-height: 300px;
         }
 
         .radio-buttons {
