@@ -1,6 +1,8 @@
 package docker
 
 import (
+ 
+ "strings"
  "errors"
  "time"
  "log"
@@ -200,10 +202,44 @@ func GoodPortal(w http.ResponseWriter, r *http.Request) {
 	end := "-webtop"
 	status := start+id.UserName()+end
 	log.Printf("QQQQQQQQQQQQQQQQQQQQQQunauthenticated user %s", status)
-	s1,s2,s3 :=  GetStatusPersonalContainer3(status)
-	log.Printf("QQQQQQQQQQQQQQQQQQQQQQunauthenticated user %s %s %s", s1,s3,s3)
+	//s1,s2,s3 :=  GetStatusPersonalContainer3(status)
+	//log.Printf("QQQQQQQQQQQQQQQQQQQQQQunauthenticated user %s %s %s", s1,s3,s3)
 
 w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+	var test string
+	var i int
+	 for _, hosts := range id.AcceptedHosts() {
+		i++
+		numberStr := fmt.Sprintf("%d", i)
+		hosts = strings.Replace(hosts, "{{ preferred_username }}", id.UserName(), 1)
+		test +=`
+	   <div class="element">
+	   <h5>Host: `+hosts+`</h3>
+            <form action="connect" method="get">
+                <div class="radio-buttons">
+                    <input type="radio" id="option`+numberStr+`_1" name="connectiontype" value="1">
+                    <label for="option`+numberStr+`_1">Modem</label>
+		     <input type="radio" id="option`+numberStr+`_2" name="connectiontype" value="2">
+		                         <label for="option`+numberStr+`_2">Low bandwidth</label>
+		    <input type="radio" id="option`+numberStr+`_3" name="connectiontype" value="3">
+		    <label for="option`+numberStr+`_3">Sattelit</label>
+
+                    <input type="radio" id="option`+numberStr+`_4" name="connectiontype" value="4">
+                    <label for="option`+numberStr+`_4">high bandwidth</label>
+
+                    <input type="radio" id="option`+numberStr+`_5" name="connectiontype" value="5">
+                    <label for="option`+numberStr+`_5">Global Network</label>
+		    <input type="radio" id="option`+numberStr+`_6" name="connectiontype" value="6">
+		    <label for="option`+numberStr+`_6">Local Net</label>
+
+                </div>
+                 <input type="hidden" id="host" name="host" value="`+hosts+`" />
+                <button type="submit" class="button-link">Connect</button>
+            </form>
+        </div>
+		` 
+        }
+
 	html := `
 	<!DOCTYPE html>
 <html lang="en">
@@ -247,6 +283,7 @@ w.Header().Set("Content-Type", "text/html; charset=UTF-8")
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
+	    overflow-y: scroll;
         }
 
         .element {
@@ -255,6 +292,7 @@ w.Header().Set("Content-Type", "text/html; charset=UTF-8")
             border: 1px solid #ccc;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
+	    min-width: 250px;
         }
 
         .radio-buttons {
@@ -521,42 +559,7 @@ w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 
     <div class="container">
-        <div class="element">
-            <h1>Тестовые данные - Элемент 1`+id.UserName()+`</h1>
-            <h3>Тестовые данные - Элемент 1`+s1+s2[0]+s3+`</h3>
-            <form action="connect" method="get">
-                <div class="radio-buttons">
-                    <input type="radio" id="option1_1" name="connectiontype" value="1">
-                    <label for="option1_1">Модем</label>
-
-                    <input type="radio" id="option1_2" name="connectiontype" value="4">
-                    <label for="option1_2">ЛВС</label>
-
-                    <input type="radio" id="option1_3" name="connectiontype" value="6">
-                    <label for="option1_3">Заебись</label>
-                </div>
-		 <input type="hidden" id="host" name="host" value="localcontainer.USERNAME-webtop:3389" />
-                <button type="submit" class="button-link">Выполнить GET запрос</button>
-            </form>
-        </div>
-
-        <div class="element">
-            <h1>Тестовые данные - Элемент 2</h1>
-            <form action="connect" method="get">
-                <div class="radio-buttons">
-                    <input type="radio" id="option2_1" name="connectiontype" value="1">
-                    <label for="option2_1">Модем</label>
-
-                    <input type="radio" id="option2_2" name="connectiontype" value="4">
-                    <label for="option2_2">ЛВС</label>
-
-                    <input type="radio" id="option2_3" name="connectiontype" value="6">
-                    <label for="option2_3">Заебись</label>
-                </div>
-		 <input type="hidden" id="host" name="host" value="localcontainer.USERNAME-webtop:3389" />
-                <button type="submit" class="button-link">Выполнить GET запрос</button>
-            </form>
-        </div>
+	`+test+`
     </div>
 </main>
 <script src="https://getbootstrap.com/docs/5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
