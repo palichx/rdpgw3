@@ -217,6 +217,8 @@ func main() {
 	r.HandleFunc("/UserInfo", protocol.UserInfo)
 	r.HandleFunc("/docker", docker.GetStatusPersonalContainer)
 	r.HandleFunc("/portal2", docker.GoodPortal)
+//	r.HandleFunc("/logout", web.Logout)
+
 	//r.HandleFunc("/portal", o.Authenticated(http.HandlerFunc(docker.GoodPortal)))
 
 	// gateway endpoint

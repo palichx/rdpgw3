@@ -76,8 +76,11 @@ func (h *OIDC) HandleCallback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unknown state", http.StatusBadRequest)
 		return
 	}
+	log.Printf("SSSSSSSSSSSSSSSUUUUUUUUUUUUUUUURK  %s by policy handler", s)
 	url := s.(string)
-
+	//url := "/portal" 
+	
+        log.Printf("UUUUUUUUUUUUUUUURK  %s by policy handler", url)
 	ctx := r.Context()
 	oauth2Token, err := h.oAuth2Config.Exchange(ctx, r.URL.Query().Get("code"))
 	if err != nil {
@@ -161,7 +164,7 @@ func (h *OIDC) HandleCallback(w http.ResponseWriter, r *http.Request) {
 			//	if err = SaveSessionIdentity(r, w, id); err != nil {
 	        	//	        http.Error(w, err.Error(), http.StatusInternalServerError)
         		//	}
-			//	http.Redirect(w, r, url, http.StatusFound)
+			//	http.Redirect(w, r, u1rl, http.StatusFound)
 				//break
         		
 		} else {

@@ -563,7 +563,7 @@ w.Header().Set("Content-Type", "text/html; charset=UTF-8")
             <li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">New...</a></li>
             <li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Profile</a></li>
             <li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Settings</a></li>
-            <li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Sign out</a></li>
+            <li><a href="/logout" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Sign out</a></li>
           </ul>
         </div>
       </li>
