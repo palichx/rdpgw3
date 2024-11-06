@@ -220,16 +220,18 @@ func GoodPortal(w http.ResponseWriter, r *http.Request) {
 	//log.Printf("QQQQQQQQQQQQQQQQQQQQQQunauthenticated user %s %s %s", s1,s3,s3)
 
 w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-	var test string
+	var test, datastrings string
 	var i int
 	 unique := uniqueElements(id.AcceptedHosts(),id.UserName())
 	 for _, hosts := range unique {
 		i++
 		numberStr := fmt.Sprintf("%d", i)
 		hosts = strings.Replace(hosts, "{{ preferred_username }}", id.UserName(), 1)
+		datastrings +=`'data`+numberStr+`': 'https://rdgw2.palich.xyz/healthcheck?hostid=`+hosts+`',` 
 		test +=`
 	   <div class="element">
-	   <h5>Host: `+hosts+`</h3>
+	   <h5>Host: `+hosts+`</h5>
+	   <h7>Status: <div id="data`+numberStr+`" style="display: inline-block;"></div></h7>
             <form action="connect" method="get">
                 <div class="radio-buttons">
                     <input type="radio" id="option`+numberStr+`_1" name="connectiontype" value="1">
@@ -266,7 +268,32 @@ w.Header().Set("Content-Type", "text/html; charset=UTF-8")
     <meta http-equiv="refresh" content="120">
     <title>Тестовые данные</title>
  <script src="https://getbootstrap.com/docs/5.3/assets/js/color-modes.js"></script>
+<script>
+ var dataSources = {
 
+	 `+datastrings+`
+
+
+	 };
+	document.addEventListener('DOMContentLoaded', function() {
+            for (var key in dataSources) {
+                loadData(key, dataSources[key]);
+            }
+        });
+
+        function loadData(elementId, url) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    document.getElementById(elementId).innerHTML = xhr.responseText;
+                } else {
+                    console.error('Ошибка при загрузке данных: ' + xhr.status);
+                }
+            };
+            xhr.send();
+        }
+    </script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
