@@ -189,13 +189,14 @@ func GetStatusPersonalContainer2(cName string) {
 }
 
 
-func uniqueElements(input []string) []string {
+func uniqueElements(input []string,username string) []string {
     uniqueMap := make(map[string]bool)
     uniqueSlice := []string{}
 
     for _, val := range input {
         if _, ok := uniqueMap[val]; !ok {
             uniqueMap[val] = true
+	    val = strings.Replace(val, "{{ preferred_username }}", username, 1)
             uniqueSlice = append(uniqueSlice, val)
         }
     }
@@ -221,7 +222,7 @@ func GoodPortal(w http.ResponseWriter, r *http.Request) {
 w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	var test string
 	var i int
-	 unique := uniqueElements(id.AcceptedHosts())
+	 unique := uniqueElements(id.AcceptedHosts(),id.UserName())
 	 for _, hosts := range unique {
 		i++
 		numberStr := fmt.Sprintf("%d", i)
@@ -262,6 +263,7 @@ w.Header().Set("Content-Type", "text/html; charset=UTF-8")
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="120">
     <title>Тестовые данные</title>
  <script src="https://getbootstrap.com/docs/5.3/assets/js/color-modes.js"></script>
 
